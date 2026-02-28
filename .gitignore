@@ -1,0 +1,34 @@
+# Binaries
+compose-validator
+compose-validator-*
+*.exe
+
+# Go
+*.test
+*.out
+vendor/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test artifacts
+tmp/
+temp/
+*.tmp
+
+# Build output
+dist/
+build/
+release/
+
+# Coverage
+coverage.out
+coverage.html

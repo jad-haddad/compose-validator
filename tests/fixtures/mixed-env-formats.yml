@@ -1,0 +1,39 @@
+# Mixed environment variable formats
+# Tests different ways to define env vars
+
+version: '3.8'
+
+services:
+  # Service using list format with KEY=value
+  web-list:
+    container_name: web-list
+    image: nginx:latest
+    environment:
+      - ZZZ_VAR=zzz_value
+      - AAA_VAR=aaa_value
+      - MMM_VAR=mmm_value
+    restart: always
+
+  # Service using list format with just KEY (no value)
+  web-keys:
+    container_name: web-keys
+    image: nginx:alpine
+    environment:
+      - ZZZ_ENABLE
+      - AAA_ENABLE
+      - MMM_ENABLE
+    restart: always
+
+  # Service using list format with variable substitution
+  web-vars:
+    container_name: web-vars
+    image: nginx:mainline
+    environment:
+      - ZZZ_PASSWORD=${ZZZ_PASSWORD}
+      - AAA_USER=${AAA_USER}
+      - MMM_HOST=${MMM_HOST:-default}
+    restart: always
+
+networks:
+  default:
+    driver: bridge

@@ -1,0 +1,58 @@
+# YAML anchors and aliases test
+# Tests that anchors are preserved during reordering
+
+version: '3.8'
+
+# Define common environment variables as anchor
+x-common-env: &common-env
+  TZ: UTC
+  LANG: en_US.UTF-8
+
+# Define common labels as anchor  
+x-common-labels: &common-labels
+  maintainer: admin@example.com
+  project: myproject
+
+services:
+  # Service using anchor merge
+  web:
+    container_name: web-server
+    image: nginx:latest
+    environment:
+      <<: *common-env
+      WEB_PORT: 80
+      ZZZ_WEB: zzz
+      AAA_WEB: aaa
+    labels:
+      <<: *common-labels
+      traefik.enable: "true"
+      app.role: web
+    restart: always
+
+  # Another service using same anchor
+  api:
+    container_name: api-server
+    image: myapp:latest
+    environment:
+      <<: *common-env
+      API_PORT: 8080
+      API_DEBUG: false
+    labels:
+      <<: *common-labels
+      app.role: api
+    restart: always
+
+  # Service with volume anchor
+  db:
+    container_name: database
+    image: postgres:15
+    environment:
+      <<: *common-env
+      POSTGRES_DB: myapp
+      POSTGRES_USER: postgres
+    restart: always
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+volumes:
+  db-data:

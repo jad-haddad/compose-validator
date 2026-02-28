@@ -1,0 +1,37 @@
+# Complex volumes test file
+# Tests various volume mount formats
+
+version: '3.8'
+
+services:
+  app:
+    container_name: app-service
+    image: myapp:latest
+    environment:
+      - APP_ENV=production
+    volumes:
+      # Named volumes (should sort alphabetically by name)
+      - cache_data:/app/cache
+      - app_data:/app/data
+      - logs:/app/logs
+      # Bind mounts with various formats (sort by host path)
+      - /var/lib/app:/app/lib
+      - /etc/app/config:/app/config:ro
+      - /data/uploads:/app/uploads:rw
+      - ./local/file.txt:/app/file.txt
+      - ../parent/config.yml:/app/config.yml
+      - /tmp:/app/tmp
+      # Relative paths with .. and .
+      - ../../shared:/app/shared
+      - ./config:/app/local-config
+      # Named volumes with options
+      - db_backup:/backup:ro
+      - app_storage:/storage:rw
+    restart: always
+
+volumes:
+  app_data:
+  cache_data:
+  logs:
+  db_backup:
+  app_storage:

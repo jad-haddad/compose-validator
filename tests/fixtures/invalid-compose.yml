@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  web:
+    image: nginx:latest
+    container_name: web-server
+    environment:
+      - ZZZ=last
+      - AAA=first
+      - MMM=middle
+    ports:
+      - "8080:80"
+    restart: always
+    volumes:
+      - /zzz:/container/zzz
+      - /aaa:/container/aaa

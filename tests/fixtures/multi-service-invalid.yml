@@ -1,0 +1,94 @@
+# Multi-service Docker Compose file - Mixed Validity
+# Contains both valid and invalid services for testing
+
+version: '3.8'
+
+services:
+  # Web server with correct field order
+  web:
+    container_name: web-server
+    image: nginx:alpine
+    environment:
+      - DEBUG=false
+      - NGINX_HOST=localhost
+      - NGINX_PORT=80
+    ports:
+      - "80:80"
+    restart: unless-stopped
+    volumes:
+      - /data/nginx/html:/usr/share/nginx/html
+    labels:
+      - "traefik.enable=true"
+
+  # Database - wrong field order (image before container_name)
+  db:
+    image: postgres:15-alpine
+    container_name: postgres-db
+    environment:
+      - POSTGRES_DB=myapp
+      - POSTGRES_USER=postgres
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    restart: always
+
+  # Cache - unalphabetized environment variables
+  cache:
+    container_name: redis-cache
+    image: redis:7-alpine
+    environment:
+      - ZZZ_LAST=last_value
+      - AAA_FIRST=first_value
+      - MMM_MIDDLE=middle_value
+    networks:
+      - backend
+    restart: always
+
+  # Worker - unalphabetized volumes
+  worker:
+    container_name: worker-app
+    image: myapp-worker:latest
+    environment:
+      - QUEUE_URL=redis://cache:6379
+    volumes:
+      - /zzz/logs:/app/zzz
+      - /aaa/data:/app/aaa
+      - /mmm/temp:/app/mmm
+    restart: on-failure
+
+  # Proxy - unalphabetized labels
+  proxy:
+    container_name: traefik-proxy
+    image: traefik:v2.10
+    networks:
+      - frontend
+    ports:
+      - "8080:8080"
+    restart: always
+    labels:
+      - "zzz.label=value"
+      - "aaa.label=value"
+      - "mmm.label=value"
+
+  # Multiple issues: wrong order + unalphabetized
+  broken:
+    user: "1000:1000"
+    container_name: broken-service
+    environment:
+      - ZZZ=value
+      - AAA=value
+    volumes:
+      - /data:/data
+    image: alpine:latest
+    restart: never
+    labels:
+      - "zzz.label=value"
+      - "aaa.label=value"
+
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
+
+volumes:
+  postgres-data:

@@ -1,0 +1,21 @@
+- id: compose-validator
+  name: Docker Compose Field Validator
+  description: Validates Docker Compose YAML field ordering and alphabetization
+  entry: compose-validator
+  language: golang
+  files: (docker-)?compose\.ya?ml$
+  pass_filenames: true
+  require_serial: false
+  minimum_pre_commit_version: 3.0.0
+  args: []
+
+- id: compose-validator-fix
+  name: Docker Compose Field Validator (Auto-fix)
+  description: Automatically fixes Docker Compose YAML field ordering and alphabetization
+  entry: compose-validator --fix
+  language: golang
+  files: (docker-)?compose\.ya?ml$
+  pass_filenames: true
+  require_serial: false
+  minimum_pre_commit_version: 3.0.0
+  args: []

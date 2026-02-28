@@ -1,0 +1,40 @@
+# First document - Services configuration
+version: '3.8'
+
+services:
+  web:
+    container_name: web-server
+    image: nginx:latest
+    environment:
+      - DEBUG=false
+    ports:
+      - "80:80"
+    restart: always
+
+  api:
+    container_name: api-server
+    image: myapp:latest
+    environment:
+      - API_PORT=8080
+    restart: always
+
+---
+# Second document - Networks configuration
+version: '3.8'
+
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
+    internal: true
+
+---
+# Third document - Volumes configuration
+version: '3.8'
+
+volumes:
+  web-data:
+    driver: local
+  api-data:
+    driver: local

@@ -1,0 +1,77 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - goos: darwin
+            goarch: amd64
+          - goos: darwin
+            goarch: arm64
+          - goos: linux
+            goarch: amd64
+          - goos: linux
+            goarch: arm64
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.22'
+    
+    - name: Build
+      env:
+        GOOS: ${{ matrix.goos }}
+        GOARCH: ${{ matrix.goarch }}
+      run: |
+        output_name="compose-validator-${{ matrix.goos }}-${{ matrix.goarch }}"
+        go build -ldflags "-X main.version=${{ github.ref_name }} -X main.commit=${{ github.sha }} -X main.date=$(date -u +%Y-%m-%d)" -o ${output_name} ./cmd/compose-validator
+    
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: compose-validator-${{ matrix.goos }}-${{ matrix.goarch }}
+        path: compose-validator-*
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: artifacts
+        pattern: compose-validator-*
+    
+    - name: Create checksums
+      run: |
+        cd artifacts
+        for dir in */; do
+          mv "${dir}"* .
+          rmdir "${dir}" 2>/dev/null || true
+        done
+        sha256sum compose-validator-* > checksums.txt
+    
+    - name: Create Release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: artifacts/*
+        generate_release_notes: true
+        draft: false
+        prerelease: false

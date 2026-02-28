@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  web:
+    container_name: web-server
+    image: nginx:latest
+    environment:
+      - AAA=first
+      - MMM=middle
+      - ZZZ=last
+    networks:
+      - web-net
+    ports:
+      - "8080:80"
+    restart: always
+    volumes:
+      - /aaa:/container/aaa
+      - /zzz:/container/zzz
+
+networks:
+  web-net:
+    driver: bridge

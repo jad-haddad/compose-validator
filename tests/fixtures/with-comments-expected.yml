@@ -1,0 +1,37 @@
+# Test file with comments - Invalid (needs fixing)
+# This file tests comment preservation during auto-fix
+
+version: '3.8'
+
+services:
+  # This is a head comment for the web service block
+  web:
+    # Head comment: Container identification
+    container_name: web-server  # Inline: Named container
+    image: nginx:latest  # Inline: Using latest nginx
+    # Head comment before environment block
+    environment:
+      # Comment before list
+      - AAA=should-be-first  # Comment on AAA
+      - MMM=middle  # Comment on MMM
+      - ZZZ=should-be-last  # Comment on ZZZ
+    # Footer comment after environment
+    ports:
+      - "8080:80"  # Inline: HTTP port
+      - "8443:443"  # Inline: HTTPS port
+    restart: always
+    # Footer comment before volumes
+    volumes:
+      # Comment before volume list
+      - /aaa/path:/container/aaa  # Comment on volume
+      - /mmm/path:/container/mmm  # Comment on volume
+      - /zzz/path:/container/zzz:ro  # Comment on volume
+    labels:
+      - "aaa.label=value"  # Should be first
+      - "mmm.label=value"  # Middle
+      - "zzz.label=value"  # Should be last
+  # End of web service
+
+networks:
+  default:
+    driver: bridge
