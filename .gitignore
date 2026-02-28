@@ -1,6 +1,6 @@
-# Binaries
-compose-validator
-compose-validator-*
+# Binaries (root level only)
+/compose-validator
+/compose-validator-*
 *.exe
 
 # Go
