@@ -62,12 +62,22 @@ jobs:
     - name: Create checksums
       run: |
         cd artifacts
-        # Flatten directory structure - artifacts come in subdirectories
-        find . -type f -name "compose-validator-*" -exec mv {} . \;
-        # Remove empty directories
-        find . -type d -empty -delete
-        # Create checksums
+        # Extract files from artifact subdirectories
+        # Artifacts are downloaded as: artifacts/name/name (dir/file)
+        for dir in */; do
+          # Get the binary name from inside the directory
+          binary=$(ls -1 "${dir}")
+          # Move binary to temp location first
+          mv "${dir}${binary}" "${binary}.tmp"
+          # Remove the now-empty directory
+          rmdir "${dir}" 2>/dev/null || true
+          # Rename from temp to final name
+          mv "${binary}.tmp" "${binary}"
+        done
+        # Create checksums for all binaries
         sha256sum compose-validator-* > checksums.txt
+        # List what we have
+        ls -la
     
     - name: Create Release
       uses: softprops/action-gh-release@v2
